@@ -28,6 +28,7 @@ public class OrderRepositoryImpl implements OrderRepository {
     public OrderRepositoryImpl() {
     }
 
+    private DataSource dataSource;
     private NamedParameterJdbcTemplate namedJDBCTemplate;
 
     @Autowired
@@ -39,7 +40,7 @@ public class OrderRepositoryImpl implements OrderRepository {
 
     public OrderRepositoryImpl(DataSource dataSource) {
 
-//       setNamedParameterJdbcTemplate(dataSource);
+      setNamedParameterJdbcTemplate(dataSource);
 
     }
 
