@@ -9,12 +9,17 @@ import com.kzn.itis.db.repositories.impl.UserRepository;
 import com.kzn.itis.db.repositories.impl.UserRepositoryImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.xml.XmlBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 
 import java.sql.*;
+import java.util.List;
 
 /**
  *
@@ -57,18 +62,15 @@ public class SpringExampleProperties {
         }
     }
 
-    private void printText(ResultSet res) {
-        try {
-            while (res.next()) {
-                String s = "";
-                int n = res.getMetaData().getColumnCount();
-                for (int i = 1; i <= n; i++) {
-                    s += res.getString(i) + " ";
-                }
-                System.out.println(s);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+    public static void printUser(List<User> users) {
+        for(User user: users) {
+            System.out.println(user.getFirstName() + " " + user.getLastName() + " " + user.getAge());
+        }
+    }
+
+    public static void printOrder(List<Order> orders) {
+        for(Order order: orders) {
+            System.out.println(order.getFirstName() + " " + order.getLastName());
         }
     }
 
@@ -76,23 +78,26 @@ public class SpringExampleProperties {
     public static void main(String... args) throws SQLException {
 
         ApplicationContext context = new ClassPathXmlApplicationContext("application-context.xml");
+
+
+
         SpringExampleProperties main = (SpringExampleProperties)context.getBean("exampleApp");
         main.run();
 
         UserRepository userRepository = context.getBean("userRepositoryImpl", UserRepositoryImpl.class);
-        //OrderRepository orderRepository = context.getBean("orderRepositoryImpl", OrderRepositoryImpl.class);
+        OrderRepository orderRepository = context.getBean("orderRepositoryImpl", OrderRepositoryImpl.class);
 
        // UserRepositoryImpl userRepository = new UserRepositoryImpl();
        // OrderRepositoryImpl orderRepository = new OrderRepositoryImpl();
 
-        userRepository.add(new User("Zalyalova", "Yasina", 19));
+       userRepository.add(new User("Zalyalova", "Yasina", 19));
         userRepository.add(new User("Nikitina", "Ekaterina", 19));
 
         System.out.println("All users count is");
         System.out.println(userRepository.countOfUsers());
 
         System.out.println("All users");
-        userRepository.getAllUsers();
+        printUser(userRepository.getAllUsers());
 
         User one = new User("Sytdikov","Ruzal",19);
         User two = new User("Zagulova","Maria",19);
@@ -105,7 +110,7 @@ public class SpringExampleProperties {
         System.out.println(userRepository.countOfUsers());
 
         System.out.println("All users");
-        userRepository.getAllUsers();
+        printUser(userRepository.getAllUsers());
 
         System.out.println("Remove last user");
         userRepository.remove();
@@ -114,12 +119,13 @@ public class SpringExampleProperties {
         userRepository.update("Gulnaz", 30);
 
         System.out.println("All users");
-        userRepository.getAllUsers();
+        printUser(userRepository.getAllUsers());
 
         System.out.println("Now users count is");
         System.out.println(userRepository.countOfUsers());
 
-   /*     System.out.println("/////////////////Orders////////////////");
+       System.out.println("/////////////////Orders////////////////");
+
         orderRepository.add(new Order("Ahmetshina", "Alsu"));
         orderRepository.add(new Order("Valiev", "Damir"));
 
@@ -127,7 +133,7 @@ public class SpringExampleProperties {
         System.out.println(orderRepository.countOfOrders());
 
         System.out.println("All orders");
-        orderRepository.getAllOrders();
+        printOrder(orderRepository.getAllOrders());
 
         Order some1 = new Order("Ahmadeeva","Venera");
         Order some2 = new Order("Gureva","Yana");
@@ -149,10 +155,10 @@ public class SpringExampleProperties {
         orderRepository.update("Gulnaz");
 
         System.out.println("All orders");
-        orderRepository.getAllOrders();
+        printOrder(orderRepository.getAllOrders());
 
         System.out.println("Now orders count is");
-        System.out.println(orderRepository.countOfOrders());*/
+        System.out.println(orderRepository.countOfOrders());
 
        // User user = new User("Ayrat", "Natfullin", 31);
 

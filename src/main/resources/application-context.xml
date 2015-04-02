@@ -24,11 +24,15 @@
     </bean>
 
 
-   <!-- <jdbc:initialize-database data-source="dataSource">
-        <jdbc:script location="classpath:db-schema.sql"/>
-    </jdbc:initialize-database>
+  <!--  <bean class="org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate" id="namedParameterJdbcTemplate">
+        <constructor-arg type="javax.sql.DataSource" ref="dataSource"/>
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
     -->
 
+    <jdbc:initialize-database data-source="dataSource">
+        <jdbc:script location="classpath:db-schema.sql"/>
+    </jdbc:initialize-database>
 
 
 

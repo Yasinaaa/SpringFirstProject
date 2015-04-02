@@ -2,16 +2,21 @@ package com.kzn.itis.db.repositories.impl;
 
 import com.kzn.itis.db.config.DatabaseConfiguration;
 import com.kzn.itis.db.model.Order;
-import com.kzn.itis.db.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.sql.*;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -23,78 +28,55 @@ public class OrderRepositoryImpl implements OrderRepository {
     public OrderRepositoryImpl() {
     }
 
-    private JdbcTemplate jdbcTemplate;
-    private DataSource dataSource;
-    private Statement orderStatement = null;
-    private DatabaseConfiguration config;
-    private Connection con;
+    private NamedParameterJdbcTemplate namedJDBCTemplate;
 
     @Autowired
-    public void setDataSource(DataSource dataSource) {
-        this.dataSource = dataSource;
-        this.jdbcTemplate = new JdbcTemplate(dataSource);
+    public void setNamedParameterJdbcTemplate(DataSource dataSource) {
+        this.namedJDBCTemplate = new NamedParameterJdbcTemplate(dataSource);
     }
 
     private static final Logger logger = LoggerFactory.getLogger(OrderRepositoryImpl.class);
 
     public OrderRepositoryImpl(DataSource dataSource) {
 
-        setDataSource(dataSource);
-
-      /*  this.config = config;
-        try {
-            con = DriverManager.getConnection(this.config.getDbUrl());
-            orderStatement = con.createStatement();
-            String creator = "CREATE TABLE ORDERS ("
-                    + "id INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY(START WITH 1,INCREMENT BY 1),"
-                    + "firstName VARCHAR(256),"
-                    + "secondName VARCHAR(256),"
-                    + "PRIMARY KEY(id))";
-            orderStatement.execute(creator);
-        } catch (SQLException e) {
-            if (!e.getSQLState().equals("X0Y32")) {
-                e.printStackTrace();
-            }
-        }*/
-
-                /*String creator = "CREATE TABLE ORDERS ("
-                        + "id INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY(START WITH 1,INCREMENT BY 1),"
-                        + "firstName VARCHAR(256),"
-                        + "secondName VARCHAR(256),"
-                        + "PRIMARY KEY(id))";*/
-
+//       setNamedParameterJdbcTemplate(dataSource);
 
     }
 
 
     @Override
     public void add(Order order) {
-        jdbcTemplate.update("INSERT INTO USERS VALUES (?,?)",
-                order.getFirstName(),
-                order.getLastName());
+        Map parametrs = new HashMap();
+        parametrs.put("firstName", order.getFirstName());
+        parametrs.put("secondName", order.getLastName());
+        namedJDBCTemplate.update("INSERT INTO ORDERS (firstName,secondName) VALUES (:firstName,:secondName)",parametrs);
     }
 
 
     @Override
     public void remove() {
         int num = countOfOrders();
-        String sql = "DELETE FROM ORDERS WHERE id=?";
-        jdbcTemplate.update(sql,countOfOrders());
+        String sql = "DELETE FROM ORDERS WHERE id=:id";
+        SqlParameterSource namedParameters = new MapSqlParameterSource("id", Integer.valueOf(num));
+        namedJDBCTemplate.update(sql, namedParameters);
     }
 
 
     @Override
     public void update(String newFirstName) {
         int num = countOfOrders();
-        String sql = "UPDATE ORDERS SET firstname=? WHERE id=?";
-        jdbcTemplate.update(sql,newFirstName,countOfOrders());
+        String sql = "UPDATE ORDERS SET firstname=:firstname WHERE id=:id";
+        MapSqlParameterSource parametrs = new MapSqlParameterSource();
+        parametrs.addValue("firstname", newFirstName);
+        parametrs.addValue("id", num);
+        namedJDBCTemplate.update(sql,parametrs);
     }
 
 
     @Override
     public List<Order> getAllOrders() {
         String sqlQuery = "SELECT * FROM ORDERS ";
-        List<Order> orders = jdbcTemplate.query(sqlQuery, new OrderMapper());
+        List<Order> orders = namedJDBCTemplate.query(sqlQuery, new OrderMapper());
         return orders;
     }
 
@@ -102,7 +84,8 @@ public class OrderRepositoryImpl implements OrderRepository {
     public int countOfOrders() {
         int count = 0;
         String sqlQuery = "SELECT COUNT(*) FROM ORDERS";
-        count = jdbcTemplate.queryForList(sqlQuery).size();
+        count = namedJDBCTemplate.getJdbcOperations().queryForInt(sqlQuery);
+
         return count;
     }
 }

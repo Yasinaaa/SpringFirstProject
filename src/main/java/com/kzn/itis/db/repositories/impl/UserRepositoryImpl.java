@@ -6,11 +6,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.sql.*;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by yasina on 13.03.15.
@@ -20,71 +25,56 @@ public class UserRepositoryImpl  implements UserRepository{
 
     private static final Logger logger = LoggerFactory.getLogger(UserRepositoryImpl.class);
 
-    private JdbcTemplate jdbcTemplate;
-    private DataSource dataSource;
-    private Statement userStm = null;
-    private DatabaseConfiguration config;
-    private Connection con;
+    private NamedParameterJdbcTemplate namedJDBCTemplate;
 
     @Autowired
-    public void setDataSource(DataSource dataSource) {
-        this.dataSource = dataSource;
-        this.jdbcTemplate = new JdbcTemplate(dataSource);
+    public void setNamedParameterJdbcTemplate(DataSource dataSource) {
+        this.namedJDBCTemplate = new NamedParameterJdbcTemplate(dataSource);
     }
 
     public UserRepositoryImpl() {
     }
 
     public UserRepositoryImpl (DataSource dataSource) {
-
-        setDataSource(dataSource);
-
-       /* this.config = config;
-        try {
-            con = DriverManager.getConnection(this.config.getDbUrl());
-            userStm = con.createStatement();
-            String creator = "CREATE TABLE USERS("
-                    + "id INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY(START WITH 1,INCREMENT BY 1),"
-                    + "lastname VARCHAR(256),"
-                    + "firstname VARCHAR(256),"
-                    + "age INTEGER not NULL,"
-                    + "PRIMARY KEY(id))";
-            userStm.execute(creator);
-        } catch (SQLException e) {
-            if (!e.getSQLState().equals("X0Y32")) {
-                e.printStackTrace();
-            }
-        }
-*/
+        //setNamedParameterJdbcTemplate(dataSource);
     }
 
     @Override
     public void add(User user) {
 
-        String sql = "INSERT INTO USERS(lastname,firstname,age) VALUES (?,?,?)";
-        jdbcTemplate.update(sql, user.getLastName(), user.getLastName(), user.getAge());
+        String sql = "INSERT INTO USERS(lastname,firstname,age) VALUES (:lastname,:firstname,:age)";
+        Map parametrs = new HashMap();
+        parametrs.put("lastname", user.getLastName());
+        parametrs.put("firstname", user.getFirstName());
+        parametrs.put("age", user.getAge());
+        namedJDBCTemplate.update(sql,parametrs);
 
     }
 
     @Override
     public void remove() {
         int num = countOfUsers();
-        String sql = "DELETE FROM USERS WHERE id=?";
-        jdbcTemplate.update(sql,countOfUsers());
+        String sql = "DELETE FROM USERS WHERE id=:id";
+        SqlParameterSource namedParameters = new MapSqlParameterSource("id", Integer.valueOf(num));
+        namedJDBCTemplate.update(sql, namedParameters);
     }
 
     @Override
     public void update(String newUser, int age) {
         int num = countOfUsers();
-        String sql = "UPDATE USERS SET firstname=? ,age=? WHERE id=?";
-        jdbcTemplate.update(sql,newUser,age,countOfUsers());
+        String sql = "UPDATE USERS SET firstname=:firstname ,age=:age WHERE id=:id";
+        MapSqlParameterSource parametrs = new MapSqlParameterSource();
+        parametrs.addValue("firstname",newUser);
+        parametrs.addValue("age", age);
+        parametrs.addValue("id", num);
+        namedJDBCTemplate.update(sql,parametrs);
 
     }
 
     @Override
     public List<User> getAllUsers() {
         String sqlQuery = "SELECT * FROM USERS";
-        List<User> users = jdbcTemplate.query(sqlQuery, new UserMapper());
+        List<User> users = namedJDBCTemplate.query(sqlQuery, new UserMapper());
         return users;
     }
 
@@ -92,7 +82,7 @@ public class UserRepositoryImpl  implements UserRepository{
     public int countOfUsers() {
         int count = 0;
         String sqlQuery = "SELECT COUNT(*) FROM USERS";
-        count = jdbcTemplate.queryForList(sqlQuery).size();
+        count = namedJDBCTemplate.getJdbcOperations().queryForInt(sqlQuery);
         return count;
     }
 }
