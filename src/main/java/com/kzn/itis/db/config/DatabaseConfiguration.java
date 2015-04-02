@@ -20,9 +20,6 @@ public class DatabaseConfiguration {
     @Value("${db.password}")
     private String dbPassword;
 
-    @Value("${hibernate.hbm2ddl.auto.init-param}")
-    private String dbHbm2ddl;
-
     public String getDbUrl() {
         return dbUrl;
     }
@@ -33,9 +30,5 @@ public class DatabaseConfiguration {
 
     public String getDbPassword() {
         return dbPassword;
-    }
-
-    public String getDbHbm2ddl() {
-        return dbHbm2ddl;
     }
 }

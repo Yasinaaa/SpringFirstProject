@@ -11,6 +11,8 @@ public class Order{
         this.firstName = firstName;
     }
 
+    public Order() {
+    }
 
     public int getId() {
         return id;
