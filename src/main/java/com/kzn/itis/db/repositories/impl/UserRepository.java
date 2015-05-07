@@ -15,5 +15,6 @@ public interface UserRepository {
     void update(String newUser, int age);
     List<User> getAllUsers();
     int countOfUsers();
+    //m void remove
 
 }
