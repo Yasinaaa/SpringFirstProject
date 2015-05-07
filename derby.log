@@ -1,0 +1,13 @@
+----------------------------------------------------------------
+Thu Mar 26 19:26:22 MSK 2015:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.11.1.1 - (1616546): instance a816c00e-014c-56e7-ebc3-000002ffb1c8 
+on database directory /home/yasina/Загрузки/examples_for_itis-master/spring-property-management-for-hibernate/myDB with class loader sun.misc.Launcher$AppClassLoader@192e0f4 
+Loaded from file:/home/yasina/.m2/repository/org/apache/derby/derby/10.11.1.1/derby-10.11.1.1.jar
+java.vendor=Oracle Corporation
+java.runtime.version=1.8.0_40-b25
+user.dir=/home/yasina/Загрузки/examples_for_itis-master/spring-property-management-for-hibernate
+os.name=Linux
+os.arch=i386
+os.version=3.13.0-48-generic
+derby.system.home=null
+Database Class Loader started - derby.database.classpath=''
