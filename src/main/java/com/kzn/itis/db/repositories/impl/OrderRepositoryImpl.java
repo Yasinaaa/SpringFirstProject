@@ -34,6 +34,7 @@ public class OrderRepositoryImpl implements OrderRepository {
     @Autowired
     public void setNamedParameterJdbcTemplate(DataSource dataSource) {
         this.namedJDBCTemplate = new NamedParameterJdbcTemplate(dataSource);
+
     }
 
     private static final Logger logger = LoggerFactory.getLogger(OrderRepositoryImpl.class);
