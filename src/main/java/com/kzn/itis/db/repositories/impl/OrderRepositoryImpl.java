@@ -39,9 +39,7 @@ public class OrderRepositoryImpl implements OrderRepository {
     private static final Logger logger = LoggerFactory.getLogger(OrderRepositoryImpl.class);
 
     public OrderRepositoryImpl(DataSource dataSource) {
-
       setNamedParameterJdbcTemplate(dataSource);
-
     }
 
 
