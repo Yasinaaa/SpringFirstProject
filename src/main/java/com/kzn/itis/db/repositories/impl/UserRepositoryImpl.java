@@ -32,6 +32,7 @@ public class UserRepositoryImpl  implements UserRepository{
         this.namedJDBCTemplate = new NamedParameterJdbcTemplate(dataSource);
     }
 
+    @Autowired
     public UserRepositoryImpl() {
     }
 
